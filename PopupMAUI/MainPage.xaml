@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+             xmlns:local="clr-namespace:PopupMAUI"
+             x:Class="PopupMAUI.MainPage" 
+             Padding="16">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="PrimaryBackgroundLight">#6750A4</Color>
+            <Color x:Key="PrimaryBorder">#D0BCFF</Color>
+            <Color x:Key="TileTextColourAlt1Light">#49454F</Color>
+            <Color x:Key="TileTextColourAlt1">#CAC4D0</Color>
+            <Color x:Key="IconColourLight">#49454F</Color>
+            <Color x:Key="IconColour">#CAC4D0</Color>
+
+            <Style TargetType="Button" x:Key="DeclineButtonStyle">
+                <Setter Property="CornerRadius" Value="20"/>
+                <Setter Property="BorderColor" Value="#79747E"/>
+                <Setter Property="BorderWidth" Value="1"/>
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Dark={StaticResource PrimaryBorder}, Light={StaticResource PrimaryBackgroundLight}}"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontFamily" Value="Roboto-Medium"/>
+            </Style>
+
+            <Style TargetType="Button" x:Key="AcceptButtonStyle">
+                <Setter Property="CornerRadius" Value="20"/>
+                <Setter Property="BorderWidth" Value="1"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontFamily" Value="Roboto-Medium"/>
+            </Style>
+
+            <Style TargetType="Label" x:Key="PopupContentLabelStyle">
+                <Setter Property="FontFamily" Value="Roboto-Regular"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="CharacterSpacing" Value="0.24"/>
+                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TileTextColourAlt1Light}, Dark={StaticResource TileTextColourAlt1}}"/>
+            </Style>
+
+            <Style TargetType="Label" x:Key="PopupHeaderLabelStyle">
+                <Setter Property="FontFamily" Value="Roboto-Regular"/>
+                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="CharacterSpacing" Value="0.15"/>
+            </Style>
+
+            <Style TargetType="popup:SfPopup">
+                <Setter Property="PopupStyle">
+                    <Setter.Value>
+                        <popup:PopupStyle HasShadow="True" CornerRadius="16" HeaderFontFamily="Roboto-Regular" HeaderFontSize="24"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <local:PopupViewModel x:Name="viewModel"/>
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ScrollView>
+            <Grid x:Name="RootLayout" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto, 0"  RowSpacing="20" Padding="20" HorizontalOptions="{OnPlatform MacCatalyst=Center,WinUI=Center}" VerticalOptions="{OnPlatform MacCatalyst=Center,WinUI=Center}">
+                <!-- Launchers bound to VM commands -->
+                <Button Grid.Row="0" Text="Modal dialog" Command="{Binding OpenModalCommand}" WidthRequest="{OnPlatform MacCatalyst=340,WinUI=340}" HeightRequest="40"  />
+                <Button Grid.Row="1" Text="Non-modal info (toast/snackbar-like)" Command="{Binding OpenToastCommand}" WidthRequest="{OnPlatform MacCatalyst=340,WinUI=340}" HeightRequest="40"  />
+                <Button Grid.Row="2"  Text="Form popup" Command="{Binding OpenFormCommand}" WidthRequest="{OnPlatform MacCatalyst=340,WinUI=340}" HeightRequest="40" />
+                <Button Grid.Row="3" Text="Anchored/teaching bubble" x:Name="AnchorButton" Command="{Binding OpenTeachingCommand}" WidthRequest="{OnPlatform MacCatalyst=340,WinUI=340}" HeightRequest="40"  />
+                <Button Grid.Row="4" Text="Full-screen overlay" Command="{Binding OpenFullScreenCommand}" WidthRequest="{OnPlatform MacCatalyst=340,WinUI=340}" HeightRequest="40" />
+                <Button Grid.Row="5" Text="Loading/progress" Command="{Binding OpenLoadingCommand}" WidthRequest="{OnPlatform MacCatalyst=340,WinUI=340}" HeightRequest="40" />
+                <Button Grid.Row="6" Text="Confirmation with illustration" Command="{Binding OpenIllustratedCommand}" WidthRequest="{OnPlatform MacCatalyst=340,WinUI=340}" HeightRequest="40"  />
+                <Button Grid.Row="{OnPlatform Android=7,iOS=7}" IsVisible="{OnPlatform WinUI=False,MacCatalyst=False}" x:Name="actionSheetButton" Text="Custom action sheet" Command="{Binding OpenActionSheetCommand}" WidthRequest="{OnPlatform MacCatalyst=340,WinUI=340}" HeightRequest="40" />
+
+                <!-- 1) Modal dialog (custom header/body/footer) -->
+                <popup:SfPopup x:Name="ModalDialog" Grid.Row="8"
+                     IsOpen="{Binding IsModalOpen}"
+                     ShowHeader="True"
+                     ShowFooter="True"
+                     StaysOpen="True"
+                     WidthRequest="320"                     
+                     AutoSizeMode="Height"
+                     FooterHeight="88"
+                     HeaderTitle="Confirm Action">
+                    <popup:SfPopup.ContentTemplate>
+                        <DataTemplate>
+                            <Grid Padding="20" WidthRequest="300" ColumnSpacing="12">
+                                <Label Text="Proceed with this operation?" Style="{StaticResource PopupContentLabelStyle}" />
+                            </Grid>
+                        </DataTemplate>
+                    </popup:SfPopup.ContentTemplate>
+                    <popup:SfPopup.FooterTemplate>
+                        <DataTemplate>
+                            <Grid Padding="20" ColumnSpacing="12" ColumnDefinitions="Auto, Auto" HorizontalOptions="End">
+                                <Button Text="Cancel" Grid.Column="0" Command="{Binding CloseModalCommand}" Style="{StaticResource DeclineButtonStyle}" />
+                                <Button Text="OK" Grid.Column="1" Command="{Binding CloseModalCommand}" Style="{StaticResource AcceptButtonStyle}" />
+                            </Grid>
+                        </DataTemplate>
+                    </popup:SfPopup.FooterTemplate>
+                </popup:SfPopup>
+
+                <!-- 2) Non-modal info (toast/snackbar-like) -->
+                <popup:SfPopup x:Name="ToastPopup" Grid.Row="8"
+                        IsOpen="{Binding IsToastOpen}"
+                        ShowHeader="False"
+                        ShowFooter="False"
+                        StaysOpen="False"
+                        AutoSizeMode="Height"
+                        WidthRequest="340"
+                        HeightRequest="50"
+                        RelativeView="{x:Reference RootLayout}"
+                        AbsoluteX="-50"
+                        AbsoluteY="-50"
+                        RelativePosition="AlignBottomRight"
+                        ShowOverlayAlways="False">
+                    <popup:SfPopup.ContentTemplate>
+                        <DataTemplate>
+                            <HorizontalStackLayout Spacing="10" Padding="2">
+                                <Label Text="✔" TextColor="#2E7D32" FontSize="20" VerticalOptions="Center" />
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Success!" FontAttributes="Bold" TextColor="#2E7D32" />
+                                    <Label Text="Your message has been sent successfully"
+                            TextColor="{AppThemeBinding Light=#333, Dark=#EEE}"
+                            MaxLines="2" LineBreakMode="TailTruncation" />
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </DataTemplate>
+                    </popup:SfPopup.ContentTemplate>
+                </popup:SfPopup>
+
+                <!-- 3) Custom action sheet -->
+                <popup:SfPopup x:Name="ActionSheetPopup" Grid.Row="8"
+                                RelativeView="{x:Reference RootLayout}"                               
+                                IsOpen="{Binding IsActionSheetOpen}"                               
+                                AnimationMode="SlideOnBottom" 
+                                RelativePosition="{OnPlatform WinUI=AlignBottom,MacCatalyst=AlignTop, Android=AlignBottom}"
+                                HeightRequest="302" HeaderHeight="86">
+                    <popup:SfPopup.PopupStyle>
+                        <popup:PopupStyle CornerRadius="16,16,0,0"/>
+                    </popup:SfPopup.PopupStyle>
+
+                    <popup:SfPopup.HeaderTemplate>
+                        <DataTemplate>
+                            <Label Text="File Actions" FontSize="16" Style="{StaticResource PopupHeaderLabelStyle}" FontFamily="Roboto-Regular"  CharacterSpacing="0.15"
+                               VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
+                        </DataTemplate>
+                    </popup:SfPopup.HeaderTemplate>
+                    <popup:SfPopup.ContentTemplate>
+                        <DataTemplate>
+                            <Grid RowSpacing="24" ColumnSpacing="26" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid Grid.Row="0" Grid.Column="0" RowSpacing="12" RowDefinitions="Auto,Auto" Margin="30,0,0,0">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Reference viewModel},Path=ShareCommand}" CommandParameter="Share"/>
+                                    </Grid.GestureRecognizers>
+                                    <Border  HeightRequest="48" WidthRequest="48" Stroke="{AppThemeBinding Light={StaticResource IconColourLight}, Dark={StaticResource IconColour}}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12"/>
+                                        </Border.StrokeShape>
+                                        <Label Text="&#xe770;" FontFamily="MauiSampleFontIcon"
+                                                FontSize="24" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                    </Border>
+                                    <Label Text="Share" Grid.Row="1" FontSize="14" FontFamily="Roboto-Regular"                                         
+                                       HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+
+                                </Grid>
+
+                                <Grid Grid.Row="0" Grid.Column="1" RowSpacing="12" RowDefinitions="Auto,Auto">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Reference viewModel},Path=UploadCommand}" CommandParameter="Upload"/>
+                                    </Grid.GestureRecognizers>
+                                    <Border HeightRequest="48" WidthRequest="48" Stroke="{AppThemeBinding Light={StaticResource IconColourLight}, Dark={StaticResource IconColour}}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12"/>
+                                        </Border.StrokeShape>
+                                        <Label Text="&#xe787;" FontFamily="MauiSampleFontIcon"
+                                               FontSize="24" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                    </Border>
+                                    <Label Text="Upload" Grid.Row="1" FontSize="14" FontFamily="Roboto-Regular"                                
+                                       HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+
+                                </Grid>
+
+                                <Grid Grid.Row="0"
+                                  Grid.Column="2"
+                                  RowSpacing="12"
+                                  RowDefinitions="Auto,Auto"
+                                  Margin="0,0,30,0">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Reference viewModel},Path=CopyCommand}" CommandParameter="Copy"/>
+                                    </Grid.GestureRecognizers>
+                                    <Border HeightRequest="48" WidthRequest="48" Stroke="{AppThemeBinding Light={StaticResource IconColourLight}, Dark={StaticResource IconColour}}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12"/>
+                                        </Border.StrokeShape>
+                                        <Label Text="&#xe737;" FontFamily="MauiSampleFontIcon"
+                                                FontSize="24" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                    </Border>
+                                    <Label Text="Copy" Grid.Row="1" FontSize="14" FontFamily="Roboto-Regular"                                       
+                                       HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+
+                                </Grid>
+
+                                <Grid Grid.Row="1"
+                                  Grid.Column="0"
+                                  RowSpacing="12"
+                                  RowDefinitions="Auto,Auto"
+                                  Margin="30,0,0,0">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Reference viewModel},Path=PrintCommand}" CommandParameter="Print"/>
+                                    </Grid.GestureRecognizers>
+                                    <Border HeightRequest="48" WidthRequest="48" Stroke="{AppThemeBinding Light={StaticResource IconColourLight}, Dark={StaticResource IconColour}}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12"/>
+                                        </Border.StrokeShape>
+                                        <Label Text="&#xe736;" FontFamily="MauiSampleFontIcon"
+                                                FontSize="24" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                    </Border>
+                                    <Label Text="Print" Grid.Row="1" FontSize="14" FontFamily="Roboto-Regular"                                    
+                                       HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+
+                                </Grid>
+
+                                <Grid Grid.Row="1" Grid.Column="1" RowSpacing="12" RowDefinitions="Auto,Auto">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Reference viewModel},Path=DeleteCommand}" CommandParameter="Delete"/>
+                                    </Grid.GestureRecognizers>
+                                    <Border HeightRequest="48" WidthRequest="48" Stroke="{AppThemeBinding Light={StaticResource IconColourLight}, Dark={StaticResource IconColour}}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12"/>
+                                        </Border.StrokeShape>
+                                        <Label Text="&#xe73C;" FontFamily="MauiSampleFontIcon"
+                                                FontSize="24" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                    </Border>
+                                    <Label Text="Delete" Grid.Row="1" FontSize="14" FontFamily="Roboto-Regular"                                
+                                       HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </popup:SfPopup.ContentTemplate>
+                </popup:SfPopup>
+
+                <!-- 4) Form popup (multi-field input) -->
+                <popup:SfPopup x:Name="FormPopup" Grid.Row="8"
+                        IsOpen="{Binding IsFormOpen}"
+                        ShowHeader="True"
+                        HeaderTitle="Create Item"
+                        ShowFooter="True"
+                        WidthRequest="360"
+                        HeightRequest="320"
+                        StaysOpen="False">
+                    <popup:SfPopup.ContentTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout Padding="12" Spacing="8" WidthRequest="320">
+                                <Entry Placeholder="Name" Text="{Binding Name}" />
+                                <Editor Placeholder="Notes" AutoSize="TextChanges" Text="{Binding Notes}" />
+                                <DatePicker Date="{Binding Date}" />
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </popup:SfPopup.ContentTemplate>
+                    <popup:SfPopup.FooterTemplate>
+                        <DataTemplate>
+                            <Grid Padding="20" ColumnSpacing="8" ColumnDefinitions="Auto, Auto">
+                                <Button Text="Cancel" Grid.Column="0" Command="{Binding CancelFormCommand}" Style="{StaticResource DeclineButtonStyle}" />
+                                <Button Text="Save" Grid.Column="1" Command="{Binding SaveFormCommand}" Style="{StaticResource AcceptButtonStyle}" />
+                            </Grid>
+                        </DataTemplate>
+                    </popup:SfPopup.FooterTemplate>
+                </popup:SfPopup>
+
+                <!-- 5) Anchored/teaching bubble (simple) -->
+                <popup:SfPopup x:Name="TeachingBubble"
+                     IsOpen="{Binding IsTeachingOpen}" Grid.Row="8"
+                     RelativeView="{x:Reference AnchorButton}"
+                     RelativePosition="AlignBottom"
+                     AbsoluteY="8"
+                     AutoSizeMode="Height"
+                     ShowHeader="False"
+                     ShowFooter="False">
+                    <popup:SfPopup.ContentTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout Padding="10" Spacing="8" WidthRequest="240">
+                                <Label Text="▼" HorizontalOptions="Start" TextColor="#888" />
+                                <Frame Padding="10" BackgroundColor="{AppThemeBinding Light=#FFF, Dark=#1E1E1E}" BorderColor="#888" CornerRadius="8">
+                                    <Label Text="Tip: You can long-press for more options." Style="{StaticResource PopupContentLabelStyle}"/>
+                                </Frame>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </popup:SfPopup.ContentTemplate>
+                </popup:SfPopup>
+
+                <!-- 6) Full-screen overlay -->
+                <popup:SfPopup x:Name="FullScreenPopup" Grid.Row="8"
+                     IsOpen="{Binding IsFullScreenOpen}"
+                     IsFullScreen="True"
+                     ShowHeader="False"
+                     StaysOpen="True"
+                     ShowFooter="False">
+                    <popup:SfPopup.ContentTemplate>
+                        <DataTemplate>
+                            <Grid BackgroundColor="#88000000" Padding="24">
+                                <VerticalStackLayout Spacing="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Label Text="Critical notice" TextColor="White" FontAttributes="Bold" FontSize="20" Style="{StaticResource PopupContentLabelStyle}" />
+                                    <Label Text="This blocks interaction until acknowledged." TextColor="White" Style="{StaticResource PopupContentLabelStyle}" />
+                                    <Button Text="Got it" Command="{Binding DismissFullScreenCommand}" Style="{StaticResource AcceptButtonStyle}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </popup:SfPopup.ContentTemplate>
+                </popup:SfPopup>
+
+                <!-- 7) Loading/progress -->
+                <popup:SfPopup x:Name="LoadingPopup" Grid.Row="8"
+                     IsOpen="{Binding IsLoadingOpen}"
+                     ShowHeader="False"
+                     AutoSizeMode="Height"
+                     ShowFooter="False">
+                    <popup:SfPopup.ContentTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout Padding="20" Spacing="10" WidthRequest="160">
+                                <ActivityIndicator IsRunning="True" />
+                                <Label Text="Loading..." HorizontalOptions="Center" Style="{StaticResource PopupContentLabelStyle}" />
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </popup:SfPopup.ContentTemplate>
+                </popup:SfPopup>
+
+                <!-- 8) Confirmation with illustration -->
+                <popup:SfPopup x:Name="IllustratedConfirm" Grid.Row="8"
+                     IsOpen="{Binding IsIllustratedOpen}"
+                     ShowHeader="False"                     
+                     ShowFooter="True"
+                     ShowCloseButton="True"
+                           AutoSizeMode="Height"
+                     WidthRequest="360">
+                    <popup:SfPopup.ContentTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout Padding="12" Spacing="12" WidthRequest="320">
+                                <Image Source="dotnet_bot.png" WidthRequest="70" HeightRequest="60" />
+                                <Label Text="You can restore this later from Settings > Archives." Style="{StaticResource PopupContentLabelStyle}"
+                     LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </popup:SfPopup.ContentTemplate>
+                    <popup:SfPopup.FooterTemplate>
+                        <DataTemplate>
+                            <Grid Padding="20" ColumnSpacing="12" ColumnDefinitions="Auto, Auto" HorizontalOptions="End">
+                                <Button Text="Cancel" Grid.Column="0" Command="{Binding CancelIllustratedCommand}" Style="{StaticResource DeclineButtonStyle}" />
+                                <Button Text="Archive" Grid.Column="1" Command="{Binding ConfirmIllustratedCommand}" Style="{StaticResource AcceptButtonStyle}" />
+                            </Grid>
+                        </DataTemplate>
+                    </popup:SfPopup.FooterTemplate>
+                </popup:SfPopup>
+
+            </Grid>
+        </ScrollView>
+
+        <Border Grid.Row="1" HeightRequest="48" WidthRequest="275" BackgroundColor="#313033"
+                    IsVisible="{Binding Source={x:Reference viewModel},Path=IsToastVisible}" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,24">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="4"/>
+            </Border.StrokeShape>
+
+            <Label Text="{Binding Source={x:Reference viewModel},Path=ToastText}" FontSize="12" FontFamily="Roboto-Regular"
+                       VerticalTextAlignment="Center" Margin="16,0,0,0" TextColor="#E6E1E5"/>
+        </Border>
+    </Grid>
+</ContentPage>
